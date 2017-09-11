@@ -134,6 +134,24 @@ public class CustomersControllerTest {
     }
 
     @Test
+    public void shouldReturnConflictIfUpdatingCustomerEmailOrUsernameParamsAlreadyExists() throws Exception {
+        Customer customer = insertCustomer();
+        Customer customer1 = insertNewCustomer(2L, "test1", "test1@gmail.com");
+        customer1.setUsername(customer.getUsername());
+        mockMvc.perform(put(URLs.CUSTOMERS)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customer1.toJson()))
+                .andExpect(status().isConflict());
+
+        customer1 = getNewCustomer(2L, "test1", "test1@gmail.com");
+        customer1.setEmail(customer.getEmail());
+        mockMvc.perform(put(URLs.CUSTOMERS)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customer1.toJson()))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     public void shouldReturnTheCustomerDetailsById() throws Exception {
         Customer customer = insertCustomer();
         mockMvc.perform(get("/customers/1"))
@@ -173,11 +191,28 @@ public class CustomersControllerTest {
         return customer;
     }
 
+    private Customer insertNewCustomer(Long id, String username, String email) throws Exception {
+        Customer customer = getNewCustomer(id, username, email);
+        customerService.save(customer);
+        return customer;
+    }
+
     private Customer getCustomer() {
         Customer customer = new Customer();
         customer.setId(1L);
         customer.setUsername("test");
         customer.setEmail("test@gmail.com");
+        customer.setPassword("testpassword");
+        customer.setFirstName("First Name");
+        customer.setLastName("Last Name");
+        return customer;
+    }
+
+    private Customer getNewCustomer(Long id, String username, String email) {
+        Customer customer = new Customer();
+        customer.setId(id);
+        customer.setUsername(username);
+        customer.setEmail(email);
         customer.setPassword("testpassword");
         customer.setFirstName("First Name");
         customer.setLastName("Last Name");

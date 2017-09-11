@@ -4,6 +4,7 @@ package com.techolution.customerdb.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -12,6 +13,8 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 public class Customer {
+
+    private static final Logger LOG = Logger.getLogger(Customer.class);
 
     @Id
     @GeneratedValue
@@ -87,9 +90,9 @@ public class Customer {
 
     public String toString() {
         try {
-            return toJson().toString();
+            return toJson();
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOG.error("Json parse error : ", e);
         }
         return super.toString();
     }

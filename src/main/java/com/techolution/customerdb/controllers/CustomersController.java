@@ -1,5 +1,8 @@
 package com.techolution.customerdb.controllers;
 
+import com.techolution.customerdb.URLs;
+import com.techolution.customerdb.controllers.exceptions.EmailAlreadyExistsException;
+import com.techolution.customerdb.controllers.exceptions.UsernameAlreadyExistsException;
 import com.techolution.customerdb.models.Customer;
 import com.techolution.customerdb.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +16,14 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static com.techolution.customerdb.URLs.CUSTOMERS;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping(CUSTOMERS)
 public class CustomersController {
 
     private CustomerService customerService;
@@ -37,12 +41,12 @@ public class CustomersController {
 
         Customer existingEmail = customerService.findByEmail(customer.getEmail());
         if (existingEmail != null) {
-            return status(CONFLICT).body("Email Already Exists");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         Customer existingUserName = customerService.findByUsername(customer.getUsername());
         if (existingUserName != null) {
-            return status(CONFLICT).body("Username Already Exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
 
         Customer newCustomer = customerService.save(customer);
@@ -56,16 +60,21 @@ public class CustomersController {
     }
 
     @RequestMapping(method = PUT)
-    public ResponseEntity updateCustomer(@Valid @RequestBody Customer customer, BindingResult result) {
+    public ResponseEntity updateCustomer(@Valid @RequestBody Customer updateCustomer, BindingResult result) {
         if (result.hasErrors()) {
             return status(BAD_REQUEST).body(result.getAllErrors());
         }
-        Customer existingCustomer = customerService.findById(customer.getId());
-        if (existingCustomer != null) {
-            Customer updatedCustomer = customerService.save(customer);
-            return ok(updatedCustomer);
+
+        Customer existingCustomer = customerService.findById(updateCustomer.getId());
+        if (existingCustomer == null) {
+            return status(NOT_FOUND).body(null);
         }
-        return status(NOT_FOUND).body(null);
+
+        checkEmailConflicts(existingCustomer, updateCustomer);
+        checkUsernameConflicts(existingCustomer, updateCustomer);
+        Customer updatedCustomer = customerService.save(updateCustomer);
+        return ok(updatedCustomer);
+
     }
 
     @RequestMapping(method = GET, value = "/{id}")
@@ -86,9 +95,30 @@ public class CustomersController {
         return ok(customer);
     }
 
+    private void checkEmailConflicts(Customer existingCustomer, Customer updateCustomer) {
+        if (existingCustomer.getEmail().equals(updateCustomer.getEmail())) {
+            return;
+        }
+        Customer existingEmail = customerService.findByEmail(updateCustomer.getEmail());
+        if (existingEmail != null) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+    }
+
+    private void checkUsernameConflicts(Customer existingCustomer, Customer updateCustomer) {
+        if (existingCustomer.getUsername().equals(updateCustomer.getUsername())) {
+            return;
+        }
+
+        Customer existingUsername = customerService.findByUsername(updateCustomer.getUsername());
+        if (existingUsername != null) {
+            throw new UsernameAlreadyExistsException("Username already exists");
+        }
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public void handleConstraintViolationException(ConstraintViolationException exception,
                                                    HttpServletResponse response) throws IOException {
-        response.sendError(NOT_FOUND.value(), exception.getMessage());
+        response.sendError(BAD_REQUEST.value(), exception.getMessage());
     }
 }
