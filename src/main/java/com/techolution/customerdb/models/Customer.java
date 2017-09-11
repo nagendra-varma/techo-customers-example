@@ -24,7 +24,6 @@ public class Customer {
 
     @Column(unique = true, nullable = false, updatable = false)
     @NotEmpty(message = "Email should not be empty")
-    @NotNull(message = "Email should not be null")
     @Email
     private String email;
     @Column(unique = true, nullable = false, updatable = false)
@@ -32,7 +31,8 @@ public class Customer {
     @NotNull(message = "Username should not be null")
     private String username;
 
-    @JsonIgnore
+    @Column(nullable = false)
+    @NotEmpty(message = "Password should not be empty")
     private String password;
 
     public boolean matchesPassword(String password) {

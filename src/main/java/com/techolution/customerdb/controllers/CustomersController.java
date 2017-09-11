@@ -1,6 +1,5 @@
 package com.techolution.customerdb.controllers;
 
-import com.techolution.customerdb.URLs;
 import com.techolution.customerdb.controllers.exceptions.EmailAlreadyExistsException;
 import com.techolution.customerdb.controllers.exceptions.UsernameAlreadyExistsException;
 import com.techolution.customerdb.models.Customer;

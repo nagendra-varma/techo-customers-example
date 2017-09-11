@@ -54,7 +54,6 @@ public class CustomersControllerTest {
                 .andExpect(status().isCreated());
         Customer testUser = customerService.findById(customer.getId());
         reflectionEquals(customer, testUser, new String[]{"id", "password"});
-        assertNull(testUser.getPassword());
     }
 
     @Test
@@ -90,6 +89,13 @@ public class CustomersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(customer.toJson()))
                 .andExpect(status().isBadRequest());
+
+        customer = getCustomer();
+        customer.setPassword("");
+        mockMvc.perform(post(URLs.CUSTOMERS)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customer.toJson()))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -114,7 +120,7 @@ public class CustomersControllerTest {
     }
 
     @Test
-    public void shouldReturnBadRequestIfInvalidParametersGivenWhileUpdatingCustomerDetails() throws Exception {
+    public void shouldReturnBadRequestIfCustomerUpdateParamsAreInvalid() throws Exception {
         Customer customer = getCustomer();
         customer.setUsername(null);
         mockMvc.perform(post(URLs.CUSTOMERS)
