@@ -1,2 +1,18 @@
 Project synopsis
 
+Synopsis format -
+https://www.google.com.sg/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwiO4urThKfYAhUL6Y8KHccTAFQQjRwIBw&url=https%3A%2F%2Fwww.slideshare.net%2Fgirija12345%2Fproject-synopsis-7467513&psig=AOvVaw0Vf49jCaY9P8oyUOnFLa9i&ust=1514355644125760
+
+Title : Enterprise App
+
+Domain: Information Technology, Android applications.
+
+Problem Statement: An Android application which configures any Android phone and restricts user access in enterprise mode.
+
+Description:
+Many enterprises wants a customized Android phone to give to user with limited access to the features. Like in Banking domain enterprises
+restrict access to camera, file upload / download access etc. But it becomes very expensive to implement all these kind of features
+in Android OS. So many of the enterprises uses legacy Blackberry or other kind of phones who provided the enterprise mode but
+they are also very expensive to buy or maintain. I'm writing an Android app which does all of the above without any Android OS 
+customizations which is less expensive and works with any Android phone. So an Organization can choose the Android phone with in
+their budget and install this application to enable Enterprise mode and everything else is taken care.
